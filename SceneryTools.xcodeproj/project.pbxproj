@@ -880,6 +880,22 @@
 		D6FF2AFA0B6E908600960D5E /* WED_Thing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6FF2AF90B6E908600960D5E /* WED_Thing.cpp */; };
 		D6FF2B8A0B6E985200960D5E /* WED_Group.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6FF2B890B6E985200960D5E /* WED_Group.cpp */; };
 		D6FF2CAC0B6F7D6B00960D5E /* GUI_SimpleTableGeometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6FF2CAB0B6F7D6B00960D5E /* GUI_SimpleTableGeometry.cpp */; };
+		D91D9776223D638A002F434A /* DSFToolCmdLine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BC365F0AB22C84003949C5 /* DSFToolCmdLine.cpp */; };
+		D91D9780223D64EB002F434A /* AssertUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BC376B0AB22C85003949C5 /* AssertUtils.cpp */; };
+		D91D9781223D64EB002F434A /* MemFileUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BC378A0AB22C85003949C5 /* MemFileUtils.cpp */; };
+		D91D9782223D64EB002F434A /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = D6BC37880AB22C85003949C5 /* md5.c */; };
+		D91D9783223D64EB002F434A /* EndianUtils.c in Sources */ = {isa = PBXBuildFile; fileRef = D6BC377A0AB22C85003949C5 /* EndianUtils.c */; };
+		D91D9784223D64EB002F434A /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = D69FD7430B6CF765008E3AEC /* unzip.c */; };
+		D91D9785223D64EB002F434A /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = D69FD7450B6CF765008E3AEC /* zip.c */; };
+		D91D9786223D64EB002F434A /* FileUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6ED3AFC0B67F0B000D5484E /* FileUtils.cpp */; };
+		D91D9787223D64EB002F434A /* tri_stripper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D678ADF00F7952B700F72139 /* tri_stripper.cpp */; };
+		D91D9789223D64EB002F434A /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20286C33FDCF999611CA2CEA /* Carbon.framework */; };
+		D91D978A223D64EB002F434A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D656B2780B51883C003FF84F /* libz.dylib */; };
+		D91D9791223D657A002F434A /* XObjReadWrite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BC36F00AB22C84003949C5 /* XObjReadWrite.cpp */; };
+		D91D9792223D6598002F434A /* ObjUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BC378D0AB22C85003949C5 /* ObjUtils.cpp */; };
+		D91D9795223D6779002F434A /* ObjToolCmdLine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91D9794223D6778002F434A /* ObjToolCmdLine.cpp */; };
+		D91D9796223D6DAA002F434A /* XObjDefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BC36EE0AB22C84003949C5 /* XObjDefs.cpp */; };
+		D91D9797223D6E9E002F434A /* ObjPointPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BC36E50AB22C84003949C5 /* ObjPointPool.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2098,6 +2114,8 @@
 		D6FF2CAA0B6F7D6B00960D5E /* GUI_SimpleTableGeometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUI_SimpleTableGeometry.h; sourceTree = "<group>"; };
 		D6FF2CAB0B6F7D6B00960D5E /* GUI_SimpleTableGeometry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUI_SimpleTableGeometry.cpp; sourceTree = "<group>"; };
 		D6FF2DBE0B6F8C0400960D5E /* QuadTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuadTree.h; sourceTree = "<group>"; };
+		D91D9790223D64EB002F434A /* ObjTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ObjTool; sourceTree = BUILT_PRODUCTS_DIR; };
+		D91D9794223D6778002F434A /* ObjToolCmdLine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjToolCmdLine.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2195,6 +2213,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D91D9788223D64EB002F434A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D91D9789223D64EB002F434A /* Carbon.framework in Frameworks */,
+				D91D978A223D64EB002F434A /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -2211,6 +2238,7 @@
 				D6C579D60C7E3C7B00FCB4C1 /* DDSTool */,
 				D607342C0D197A1100E08F61 /* MeshTool */,
 				D6A2665E0F99266D00E1E754 /* XPlaneSupportMac.p */,
+				D91D9790223D64EB002F434A /* ObjTool */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2765,6 +2793,7 @@
 		D6BC36DC0AB22C84003949C5 /* Obj */ = {
 			isa = PBXGroup;
 			children = (
+				D91D9794223D6778002F434A /* ObjToolCmdLine.cpp */,
 				D6BC36E10AB22C84003949C5 /* ObjConvert.cpp */,
 				D6BC36E20AB22C84003949C5 /* ObjConvert.h */,
 				D6BC36E30AB22C84003949C5 /* ObjDraw.cpp */,
@@ -3851,6 +3880,22 @@
 			productReference = D6ED37490B67964D00D5484E /* WED.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D91D9777223D64EB002F434A /* ObjTool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D91D978B223D64EB002F434A /* Build configuration list for PBXNativeTarget "ObjTool" */;
+			buildPhases = (
+				D91D9778223D64EB002F434A /* Sources */,
+				D91D9788223D64EB002F434A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ObjTool;
+			productName = DSFTool;
+			productReference = D91D9790223D64EB002F434A /* ObjTool */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -3888,6 +3933,7 @@
 				D67EF96F0B6135F400D9190C /* ObjConverter */,
 				D6C579BC0C7E3C7B00FCB4C1 /* DDSTool */,
 				D60734100D197A1100E08F61 /* MeshTool */,
+				D91D9777223D64EB002F434A /* ObjTool */,
 				D6A2665D0F99266D00E1E754 /* ac3d */,
 				D61C26E70B6155960092E098 /* Build Tools */,
 				D6C68DDD0BEFB3B300C9F880 /* Build All */,
@@ -4659,6 +4705,7 @@
 				D6F3F0881D07294E00188B28 /* WED_MetadataUpdate.cpp in Sources */,
 				D629FADF0B95DE3E00A2FB57 /* WED_MapBkgnd.cpp in Sources */,
 				D629FB020B95E38900A2FB57 /* WED_HandleToolBase.cpp in Sources */,
+				D91D9776223D638A002F434A /* DSFToolCmdLine.cpp in Sources */,
 				D629FB3D0B960A7200A2FB57 /* WED_MarqueeTool.cpp in Sources */,
 				D6A17E1A0BA5994900BBCD0C /* WED_EnumSystem.cpp in Sources */,
 				D6A17F9C0BA5E2A200BBCD0C /* WED_AirportBeacon.cpp in Sources */,
@@ -4801,6 +4848,26 @@
 				D6ABE9E319F1F8CC00684AC1 /* WED_GatewayImport.cpp in Sources */,
 				D6ABE9E419F1F8CC00684AC1 /* WED_VerTable.cpp in Sources */,
 				D63112CA1A240A6300524526 /* WED_ICAOTable.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D91D9778223D64EB002F434A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D91D9797223D6E9E002F434A /* ObjPointPool.cpp in Sources */,
+				D91D9796223D6DAA002F434A /* XObjDefs.cpp in Sources */,
+				D91D9791223D657A002F434A /* XObjReadWrite.cpp in Sources */,
+				D91D9792223D6598002F434A /* ObjUtils.cpp in Sources */,
+				D91D9780223D64EB002F434A /* AssertUtils.cpp in Sources */,
+				D91D9781223D64EB002F434A /* MemFileUtils.cpp in Sources */,
+				D91D9782223D64EB002F434A /* md5.c in Sources */,
+				D91D9783223D64EB002F434A /* EndianUtils.c in Sources */,
+				D91D9784223D64EB002F434A /* unzip.c in Sources */,
+				D91D9795223D6779002F434A /* ObjToolCmdLine.cpp in Sources */,
+				D91D9785223D64EB002F434A /* zip.c in Sources */,
+				D91D9786223D64EB002F434A /* FileUtils.cpp in Sources */,
+				D91D9787223D64EB002F434A /* tri_stripper.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6003,6 +6070,34 @@
 			};
 			name = DebugOpt;
 		};
+		D91D978C223D64EB002F434A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D91D978D223D64EB002F434A /* Phone */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Phone;
+		};
+		D91D978E223D64EB002F434A /* DebugOpt */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = DebugOpt;
+		};
+		D91D978F223D64EB002F434A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -6145,6 +6240,17 @@
 				D60E98F30EDDDEEA0096DE0E /* Phone */,
 				D6F01D770CDABA8D00A3F1B0 /* DebugOpt */,
 				D6ED37480B67964D00D5484E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D91D978B223D64EB002F434A /* Build configuration list for PBXNativeTarget "ObjTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D91D978C223D64EB002F434A /* Debug */,
+				D91D978D223D64EB002F434A /* Phone */,
+				D91D978E223D64EB002F434A /* DebugOpt */,
+				D91D978F223D64EB002F434A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

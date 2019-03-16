@@ -26,7 +26,7 @@
 
 #include "XObjReadWrite.h"
 #include "XObjDefs.h"
-#include "AssertUtils.h"
+#include "../Utils/AssertUtils.h"
 #include <math.h>
 
 #ifndef CRLF
