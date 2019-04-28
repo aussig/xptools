@@ -70,7 +70,7 @@ int main(int argc, char * argv[])
 			else
             {
                 GetObjDimensions8(obj8, mins, maxs);
-                printf("%f, %f, %f\n", maxs[0] - mins[0], maxs[1] - mins[1], maxs[2] - mins[2]);
+                printf("%f,%f,%f\n", maxs[0] - mins[0], maxs[1] - mins[1], maxs[2] - mins[2]);
             }
 		}
 
