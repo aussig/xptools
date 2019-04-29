@@ -22,8 +22,8 @@
 #define AC3DPLUGIN_VER		30400
 #define AC3DPLUGIN_EXTRAVER	"b4"
 
-#define OBJTOOL_VER        10000
-#define OBJTOOL_EXTRAVER    "-r1"
+#define CLITOOL_VER        10000
+#define CLITOOL_EXTRAVER    "-r1"
 
 #define _VERBUF_SIZE		256
 static char __gverbuf[_VERBUF_SIZE];

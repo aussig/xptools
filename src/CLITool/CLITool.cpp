@@ -23,11 +23,11 @@
  */
 
 #include "../XPTools/version.h"
-#include "XObjReadWrite.h"
+#include "../Obj/XObjReadWrite.h"
 #include <stdio.h>
 #include "../Utils/AssertUtils.h"
 #include "../Utils/ObjUtils.h"
-#include "XObjDefs.h"
+#include "../Obj/XObjDefs.h"
 
 #if IBM
 #include <stdlib.h>
@@ -64,7 +64,7 @@ int main(int argc, char * argv[])
             
 			if (!XObj8Read(f1, obj8))
             {
-                fprintf(err_fi, "Error: unable to open OBJ file %s\n", f1);
+                fprintf(err_fi, "Error: unable to open file %s\n", f1);
                 exit(1);
             }
 			else
@@ -72,17 +72,15 @@ int main(int argc, char * argv[])
                 GetObjDimensions8(obj8, mins, maxs);
                 printf("%f,%f,%f\n", maxs[0] - mins[0], maxs[1] - mins[1], maxs[2] - mins[2]);
             }
-		}
-
-		if (!strcmp(argv[n], "--version"))
+        } else if (!strcmp(argv[n], "--version"))
 		{
-			print_product_version("ObjTool", OBJTOOL_VER, OBJTOOL_EXTRAVER);
+			print_product_version("CLITool", CLITOOL_VER, CLITOOL_EXTRAVER);
 		}
 	}
 
 	return 0;
 help:
-    fprintf(err_fi, "Usage: %s --measure [objfile] - Prints dimensions in m: x, y, z\n",argv[0]);
+    fprintf(err_fi, "Usage: %s --measure [file]    - Prints dimensions in m: x, y, z\n",argv[0]);
 	fprintf(err_fi, "       %s --version           - Prints version information\n",argv[0]);
 	return 1;
 }
