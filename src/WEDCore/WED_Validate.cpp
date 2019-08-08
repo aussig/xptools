@@ -61,6 +61,7 @@
 #include "WED_Group.h"
 #include "WED_EnumSystem.h"
 #include "WED_Menus.h"
+#include "WED_GatewayExport.h"
 #include "WED_GroupCommands.h"
 #include "WED_MetaDataKeys.h"
 
@@ -77,6 +78,7 @@
 #include "FileUtils.h"
 #include "MemFileUtils.h"
 #include "PlatformUtils.h"
+#include "STLUtils.h"
 #include "MathUtils.h"
 
 #include "WED_Document.h"
@@ -455,8 +457,31 @@ static void ValidateOneFacadePlacement(WED_Thing* who, validation_error_vector& 
 		msgs.push_back(validation_error_t("Facades may not have holes in them.", err_gis_poly_facades_may_not_have_holes, who,apt));
 	}
 
-	if(gExportTarget == wet_xplane_900 && WED_HasBezierPol(fac))
-		msgs.push_back(validation_error_t("Curved facades are only supported in X-Plane 10 and newer.", err_gis_poly_facades_curved_only_for_gte_xp10, who,apt));
+	if(WED_HasBezierPol(fac))
+	{
+		if(gExportTarget == wet_xplane_900)
+			msgs.push_back(validation_error_t("Curved facades are only supported in X-Plane 10 and newer.", err_gis_poly_facades_curved_only_for_gte_xp10, who,apt));
+		else if(fac->GetType() < 2)
+			msgs.push_back(validation_error_t("Only Type2 facades support curved segements.", warn_facades_curved_only_type2, who,apt));
+	}
+
+	if(fac->HasLayer(gis_Param))
+	{
+		int maxWalls = fac->GetNumWallChoices();
+		IGISPointSequence * ips = fac->GetOuterRing();
+		int nn = ips->GetNumPoints();
+		for(int i = 0; i < nn; ++i)
+		{
+			Point2 pt;
+			IGISPoint * igp = ips->GetNthPoint(i);
+			igp->GetLocation(gis_Param, pt);
+						
+			if(pt.x() >= maxWalls)
+			{
+				msgs.push_back(validation_error_t("Facade node specifies wall not defined in facade resource.", err_facade_illegal_wall, dynamic_cast<WED_Thing *>(igp), apt));
+			}
+		}
+	}
 }
 
 static void ValidateOneForestPlacement(WED_Thing* who, validation_error_vector& msgs, WED_Airport * apt)
@@ -1002,7 +1027,7 @@ static void ValidateOneATCFlow(WED_ATCFlow * flow, validation_error_vector& msgs
 		for(int i = 0; i < 360; ++i)                                       // in complex multi-time or ceiling flows settings when ALL prior flows have time rules that together cover 24hrs.
 			sWindsCov[i] = max(sWindThisFlow[i], sWindsCov[i]);             // Such is bad style - one shold rather have one flow with a time rule followed by a time-unlimited flow.
 
-	#if !GATEWAY_IMPORT_FEATURES
+#if !GATEWAY_IMPORT_FEATURES
 
 	map<int,vector<WED_ATCRunwayUse*> >		arrival_rwys;
 	map<int,vector<WED_ATCRunwayUse*> >		departure_rwys;
@@ -1053,11 +1078,9 @@ static void ValidateOneATCFlow(WED_ATCFlow * flow, validation_error_vector& msgs
 			}
 		}
 	}
-	#endif
-
 	if (arrival_rwys.empty() || departure_rwys.empty())
 		msgs.push_back(validation_error_t("Airport flow must specify at least one active arrival and one departure runway", err_flow_no_arr_or_no_dep_runway, flow, apt));
-
+#endif
 }
 
 static void ValidateATC(WED_Airport* apt, validation_error_vector& msgs, set<int>& legal_rwy_oneway, set<int>& legal_rwy_twoway)
@@ -1257,7 +1280,7 @@ static void ValidateOneRampPosition(WED_RampPosition* ramp, validation_error_vec
 			{
 				if(airlines_str[i - 3] != ' ')
 				{
-					msgs.push_back(validation_error_t(string("Ramp start airlines string '") + orig_airlines_str + "' must have a space bewteen every three letter airline code.", err_ramp_airlines_is_not_spaced_correctly, ramp, apt));
+					msgs.push_back(validation_error_t(string("Ramp start airlines string '") + orig_airlines_str + "' must have a space between every three letter airline code.", err_ramp_airlines_is_not_spaced_correctly, ramp, apt));
 					break;
 				}
 
@@ -1895,6 +1918,28 @@ static void ValidateAirportMetadata(WED_Airport* who, validation_error_vector& m
 			msgs.push_back(validation_error_t("Metadata value " + *itr + " contains 'http', is likely a URL", err_airport_metadata_invalid, who, apt));
 		}
 	}
+
+	string txt = "Metadata key '" + META_KeyDisplayText(wed_AddMetaDataLGuiLabel) + "'";
+
+	if(who->ContainsMetaDataKey(wed_AddMetaDataLGuiLabel))
+	{
+		string metaValue = who->GetMetaDataValue(wed_AddMetaDataLGuiLabel);
+		if(metaValue != "2D" && metaValue != "3D")
+				msgs.push_back(validation_error_t(txt + " must be either '2D' or '3D'", err_airport_metadata_invalid, who, apt));
+	}
+	
+	if(gExportTarget >= wet_xplane_1130 && gExportTarget != wet_gateway)   // For the gateway target - the gui_label tags are forced prior to export, anyways.
+	{                                                                      // So don't bother the user with this detail or force him to set it 'right'
+		if(who->ContainsMetaDataKey(wed_AddMetaDataLGuiLabel))
+		{
+			const char * has3D = GatewayExport_has_3d(who) ? "3D" : "2D";
+			string metaValue = who->GetMetaDataValue(wed_AddMetaDataLGuiLabel);
+			if(metaValue != has3D)
+				msgs.push_back(validation_error_t(txt + " does not match current (" + has3D + ") scenery content", warn_airport_metadata_invalid, who, apt));
+		}
+		else
+			msgs.push_back(validation_error_t(txt + " does not exist, but is needed by the XP 11.35+ GUI", warn_airport_metadata_invalid, who, apt));
+	}
 }
 
 static void ValidateOneTaxiSign(WED_AirportSign* airSign, validation_error_vector& msgs, WED_Airport * apt)
@@ -1905,22 +1950,28 @@ static void ValidateOneTaxiSign(WED_AirportSign* airSign, validation_error_vecto
 
 	string signName;
 	airSign->GetName(signName);
-
-	//Create the necessary parts for a parsing operation
-	parser_in_info in(signName);
-	parser_out_info out;
-
-	ParserTaxiSign(in,out);
-	if(out.errors.size() > 0)
+	if(signName.empty())
 	{
-		int MAX_ERRORS = 12;//TODO - Is this good?
-		string m;
-		for (int i = 0; i < MAX_ERRORS && i < out.errors.size(); i++)
+		msgs.push_back(validation_error_t("Taxi Sign is blank.", err_sign_error, airSign, apt));
+	}
+	else
+	{
+		//Create the necessary parts for a parsing operation
+		parser_in_info in(signName);
+		parser_out_info out;
+
+		ParserTaxiSign(in,out);
+		if(out.errors.size() > 0)
 		{
-			m += out.errors[i].msg;
-			m += '\n';
+			int MAX_ERRORS = 12;//TODO - Is this good?
+			string m;
+			for (int i = 0; i < MAX_ERRORS && i < out.errors.size(); i++)
+			{
+				m += out.errors[i].msg;
+				m += '\n';
+			}
+			msgs.push_back(validation_error_t(m, err_sign_error, airSign,apt));
 		}
-		msgs.push_back(validation_error_t(m, err_sign_error, airSign,apt));
 	}
 }
 
@@ -2216,17 +2267,17 @@ static void ValidateOneAirport(WED_Airport* apt, validation_error_vector& msgs, 
 		for(vector<WED_DrapedOrthophoto *>::iterator o = orthos.begin(); o != orthos.end(); ++o)
 		{
 			string res;
-			pol_info_t pol;
+			const pol_info_t * pol;
 
 			(*o)->GetResource(res);
 			res_mgr->GetPol(res,pol);
 
-			if (!pol.mSubBoxes.size())
+			if (!pol->mSubBoxes.size())
 			{
 				orthos_illegal.push_back(*o);
 			}
 //			else
-//				printf("kosher ortho, has %d subtex\n", pol.mSubBoxes.size());
+//				printf("kosher ortho, has %d subtex\n", pol->mSubBoxes.size());
 		}
 		if(!orthos_illegal.empty())
 			msgs.push_back(validation_error_t("Only Orthophotos with automatic subtexture selection can be exported to the Gateway. Please hide or remove selected Orthophotos.",
@@ -2289,6 +2340,21 @@ static void ValidateOneAirport(WED_Airport* apt, validation_error_vector& msgs, 
 		for(set<int>::iterator i = legal_rwy_oneway.begin(); i != legal_rwy_oneway.end(); ++i)
 		{
 			rwys_missing.erase(*i);    // remove those runways that can be found in the scenery for this airport
+		}
+		for(auto i : sealanes)
+		{
+			string name;	i->GetName(name);
+			vector<string> parts;  tokenize_string(name.begin(),name.end(),back_inserter(parts), '/');
+	
+			for(auto p : parts)
+			{
+				if(p.back() == 'W')	p.pop_back();                       // We want to allow sealanes with or without W suffix to satisfy CIFP validation
+				int e = ENUM_LookupDesc(ATCRunwayOneway,p.c_str());
+				if(legal_rwy_oneway.find(e) == legal_rwy_oneway.end())   // but only if that name does not collide with a paved runway at the same airport
+				{
+					rwys_missing.erase(e);
+				}
+			}
 		}
 		if (!rwys_missing.empty())
 		{
@@ -2439,7 +2505,7 @@ validation_result_t	WED_ValidateApt(WED_Document * resolver, WED_MapPane * pane,
 		mCacheRequest.in_folder_prefix = "scenery_packs";
 		mCacheRequest.in_url = WED_URL_CIFP_RUNWAYS;
 
-		WED_file_cache_response res = WED_file_cache_request_file(mCacheRequest);
+		WED_file_cache_response res = gFileCache.request_file(mCacheRequest);
 
 	/* ToDo: get a better way to do automatic retryies for cache updates.
 		Ultimately, during the actual gateway submission we MUST wait and get full verification
@@ -2456,7 +2522,7 @@ validation_result_t	WED_ValidateApt(WED_Document * resolver, WED_MapPane * pane,
 	#else
 				sleep(1);
 	#endif
-				res = WED_file_cache_request_file(mCacheRequest);
+				res = gFileCache.request_file(mCacheRequest);
 			}
 		}
 

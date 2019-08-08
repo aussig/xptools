@@ -34,9 +34,7 @@
 #include "WED_ToolUtils.h"
 #include "WED_MarqueeTool.h"
 #include "WED_CreateBoxTool.h"
-#if AIRPORT_ROUTING
 #include "WED_CreateEdgeTool.h"
-#endif
 #include "WED_CreatePolygonTool.h"
 #include "WED_CreatePointTool.h"
 #include "WED_CreateLineTool.h"
@@ -189,11 +187,7 @@ WED_MapPane::WED_MapPane(GUI_Commander * cmdr, double map_bounds[4], IResolver *
 
 
 	mTools.push_back(					new WED_CreatePolygonTool("Boundary",mMap, mMap, resolver, archive, create_Boundary));
-#if AIRPORT_ROUTING
 	mTools.push_back(					new WED_CreateEdgeTool("Taxi Routes",mMap, mMap, resolver, archive, create_TaxiRoute));
-#else
-	mTools.push_back(					NULL);
-#endif
 
 	mTools.push_back(					new WED_CreatePointTool("Tower Viewpoint", mMap, mMap, resolver, archive, create_TowerViewpoint));
 	mTools.push_back(					new WED_CreatePointTool("Ramp Start", mMap, mMap, resolver, archive, create_RampStart));
@@ -488,7 +482,8 @@ void			WED_MapPane::FromPrefs(IDocPrefs * prefs)
 #if WANT_TERRASEVER
 	if ((mTerraserver->IsVisible () ? 1 : 0) != prefs->ReadIntPref("map/terraserver_vis",mTerraserver->IsVisible()  ? 1 : 0))		mTerraserver->ToggleVisible();
 #endif
-	if ((mSlippyMap->IsVisible() ? 1 : 0) != prefs->ReadIntPref("map/slippy_vis"   ,mSlippyMap->IsVisible() ? 1 : 0)) mSlippyMap->ToggleVisible();
+	int SlippyPrefs = prefs->ReadIntPref("map/slippy_vis", mSlippyMap->GetMode());
+	mSlippyMap->SetMode(SlippyPrefs);
 	if ((mNavaidMap->IsVisible() ? 1 : 0) != prefs->ReadIntPref("map/navaid_map_vis",  mNavaidMap->IsVisible()  ? 1 : 0))	mNavaidMap->ToggleVisible();
 	if ((mPreview->IsVisible ()  ? 1 : 0) != prefs->ReadIntPref("map/preview_vis"  ,mPreview->IsVisible()   ? 1 : 0)) mPreview->ToggleVisible();
 
@@ -564,7 +559,7 @@ void			WED_MapPane::ToPrefs(IDocPrefs * prefs)
 #if WANT_TERRASEVER
 	prefs->WriteIntPref("map/terraserver_vis",mTerraserver->IsVisible() ? 1 : 0);
 #endif
-	prefs->WriteIntPref("map/slippy_vis",mSlippyMap->IsVisible() ? 1 : 0);
+	prefs->WriteIntPref("map/slippy_vis",mSlippyMap->IsVisible() ? mSlippyMap->GetMode() : 0);
 	prefs->WriteIntPref("map/preview_vis",mPreview->IsVisible() ? 1 : 0);
 	prefs->WriteIntPref("map/pavement_alpha",mPreview->GetPavementTransparency()*4);
 	prefs->WriteIntPref("map/obj_density",mPreview->GetObjDensity());

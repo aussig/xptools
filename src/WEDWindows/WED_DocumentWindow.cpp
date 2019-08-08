@@ -260,26 +260,34 @@ WED_DocumentWindow::WED_DocumentWindow(
 	XWin::GetWindowLoc(xy,xy+1);
 
 	// This is a safety-hack.  The user's prefs may specify the window at a location that
-	// is off screen,either because the prefs are borked or because the doc came from
-	// a machine with a much larger dekstop.  So...
+	// is off screen, either because the prefs are borked or because the doc came from
+	// a machine with a much larger dekstop. So...
 	//
 	// Coming in we have the default rect for a window - hopefully it is BIG because we
-	// pass xwin_style_fullscreen to XWin.  So if our currnet location does not overlap
-	// with that AT ALL assume the window is off in space.
-	//
-	// TODO: someday check the window against the real desktop per platform.
-	int safe_rect[4] = { xy[0] ,xy[1], xy[0] + zw[0], xy[1] + zw[1] };
+	// pass xwin_style_fullscreen to XWin.  So if our currnet location does not allow 
+	// for at least one 100x100 pixel corner to be inside the current Desktop 
+	// (which is the bounding box around ALL monitors) - then ignore the preferences
+	// and the new window will pop up fullscreen on the primary monitor instead.
+
+//	printf("FullScreen xy %d %d wh %d %d\n", xy[0], xy[1], zw[0], zw[1]);
+	
+	int safe_rect[4] = { xy[0], xy[1], xy[0] + zw[0], xy[1] + zw[1] };
+	XWin::GetDesktop(safe_rect);
 
 	xy[0]  = inDocument->ReadIntPref("window/x_loc",xy[0]);
 	xy[1]  = inDocument->ReadIntPref("window/y_loc",xy[1]);
 	zw[0] = inDocument->ReadIntPref("window/width",zw[0]);
 	zw[1] = inDocument->ReadIntPref("window/height",zw[1]);
 
-	if(xy[0] < safe_rect[2] && xy[1] < safe_rect[3] &&
-	  (xy[0] + zw[0]) >= safe_rect[0] && (xy[1] + zw[1]) >= safe_rect[1])
+//	printf("from Prefs xy %d %d wh %d %d\n", xy[0], xy[1], zw[0], zw[1]);
+
+	if(xy[0] < safe_rect[2]-100 && xy[1] < safe_rect[3]-100 &&
+	  (xy[0] + zw[0]) >= safe_rect[0]+100 && (xy[1] + zw[1]) >= safe_rect[1]+100)
 	{
 		SetBounds(xy[0],xy[1],xy[0]+zw[0],xy[1]+zw[1]);
 	}
+//	else
+//		printf("SafeRect was triggerd\n");
 
 	int main_split = inDocument->ReadIntPref("window/main_split",zw[0] / 5);
 	int main_split2 = inDocument->ReadIntPref("window/main_split2",zw[0] * 2 / 3);
@@ -359,10 +367,8 @@ int	WED_DocumentWindow::HandleCommand(int command)
 	case gui_Clear:		WED_DoClear(mDocument); return 1;
 	case wed_Crop:		WED_DoCrop(mDocument); return 1;
 	//case wed_Overlay:	WED_MakeOrthos(mDocument); return 1;
-#if AIRPORT_ROUTING
 //	case wed_MakeRouting:WED_MakeRouting(mDocument); return 1;
 	case wed_Merge:		WED_DoMerge(mDocument); return 1;
-#endif
 	case wed_Split:		WED_DoSplit(mDocument); return 1;
 	case wed_Align:		WED_DoAlign(mDocument); return 1;
 	case wed_MatchBezierHandles:	WED_DoMatchBezierHandles(mDocument); return 1;
@@ -385,12 +391,10 @@ int	WED_DocumentWindow::HandleCommand(int command)
 	case wed_BreakApartSpecialAgps: WED_DoBreakApartSpecialAgps(mDocument); return 1;
 	case wed_ReplaceVehicleObj:  WED_DoReplaceVehicleObj(mDocument); return 1;
 	case wed_AddATCFreq:WED_DoMakeNewATCFreq(mDocument); return 1;
-#if AIRPORT_ROUTING
 	case wed_AddATCFlow: WED_DoMakeNewATCFlow(mDocument); return 1;
 	case wed_AddATCRunwayUse:WED_DoMakeNewATCRunwayUse(mDocument); return 1;
 	case wed_AddATCTimeRule: WED_DoMakeNewATCTimeRule(mDocument); return 1;
 	case wed_AddATCWindRule: WED_DoMakeNewATCWindRule(mDocument); return 1;
-#endif
 	case wed_UpgradeRamps:	WED_UpgradeRampStarts(mDocument);	return 1;
 	case wed_AlignApt:	WED_AlignAirports(mDocument);	return 1;
 	case wed_CreateApt:	WED_DoMakeNewAirport(mDocument); return 1;
@@ -408,7 +412,6 @@ int	WED_DocumentWindow::HandleCommand(int command)
 	case wed_SelectPoly:	WED_DoSelectPolygon(mDocument);	return 1;
 	case wed_SelectConnected:WED_DoSelectConnected(mDocument);	return 1;
 
-#if AIRPORT_ROUTING
 	case wed_SelectZeroLength:	if(!WED_DoSelectZeroLength(mDocument))		DoUserAlert("Your project has no zero-length ATC routing lines.");	return 1;
 	case wed_SelectDoubles:		if(!WED_DoSelectDoubles(mDocument))			DoUserAlert("Your project has no doubled ATC routing nodes.");	return 1;
 	case wed_SelectCrossing:	if(!WED_DoSelectCrossing(mDocument))		DoUserAlert("Your project has no crossed ATC routing lines.");	return 1;
@@ -418,7 +421,7 @@ int	WED_DocumentWindow::HandleCommand(int command)
 	case wed_SelectDefaultObjects:		WED_DoSelectDefaultObjects(mDocument); return 1;
 	case wed_SelectThirdPartyObjects:	WED_DoSelectThirdPartyObjects(mDocument); return 1;
 	case wed_SelectMissingObjects:		WED_DoSelectMissingObjects(mDocument); return 1;
-#endif
+
 	case wed_UpdateMetadata:     WED_DoUpdateMetadata(mDocument); return 1;
 	case wed_ExportApt:		WED_DoExportApt(mDocument, mMapPane); return 1;
 	case wed_ExportPack:	WED_DoExportPack(mDocument, mMapPane); return 1;
@@ -482,10 +485,8 @@ int	WED_DocumentWindow::CanHandleCommand(int command, string& ioName, int& ioChe
 						else				{								return 0; }
 	case gui_Clear:		return	WED_CanClear(mDocument);
 	case wed_Crop:		return	WED_CanCrop(mDocument);
-#if AIRPORT_ROUTING
 //	case wed_MakeRouting:
 	case wed_Merge:		return WED_CanMerge(mDocument);
-#endif
 	case wed_Overlay:														return 1;
 	case gui_Close:															return 1;
 	case wed_Split:		return WED_CanSplit(mDocument);
@@ -504,7 +505,6 @@ int	WED_DocumentWindow::CanHandleCommand(int command, string& ioName, int& ioChe
 	case wed_ConvertToTaxiline:	return WED_CanConvertTo(mDocument, &IsType<WED_AirportChain>, false);
 	case wed_ConvertToLine:		return WED_CanConvertTo(mDocument, &IsType<WED_LinePlacement>, false);
 	case wed_AddATCFreq:return WED_CanMakeNewATCFreq(mDocument);
-#if AIRPORT_ROUTING
 	case wed_AddATCFlow:return WED_CanMakeNewATCFlow(mDocument);
 	case wed_AddATCRunwayUse:return WED_CanMakeNewATCRunwayUse(mDocument);
 	case wed_AddATCTimeRule: return WED_CanMakeNewATCTimeRule(mDocument);
@@ -512,7 +512,6 @@ int	WED_DocumentWindow::CanHandleCommand(int command, string& ioName, int& ioChe
 	case wed_UpgradeRamps:   return 1;
 	case wed_AlignApt:      return 1;
 
-#endif
 	case wed_CreateApt:	return WED_CanMakeNewAirport(mDocument);
 	case wed_EditApt:	return WED_CanSetCurrentAirport(mDocument, ioName);
 	case wed_UpdateMetadata:     return WED_CanUpdateMetadata(mDocument);
@@ -533,7 +532,6 @@ int	WED_DocumentWindow::CanHandleCommand(int command, string& ioName, int& ioChe
 	case wed_SelectPoly:	return WED_CanSelectPolygon(mDocument);
 	case wed_SelectConnected:	return WED_CanSelectConnected(mDocument);
 
-#if AIRPORT_ROUTING
 	case wed_SelectZeroLength:
 	case wed_SelectDoubles:
 	case wed_SelectCrossing:
@@ -542,7 +540,6 @@ int	WED_DocumentWindow::CanHandleCommand(int command, string& ioName, int& ioChe
 	case wed_SelectDefaultObjects:
 	case wed_SelectThirdPartyObjects:
 	case wed_SelectMissingObjects:	return 1;
-#endif
 
 	case wed_ExportApt:		return WED_CanExportApt(mDocument);
 	case wed_ExportPack:	return WED_CanExportPack(mDocument);
